@@ -1047,6 +1047,7 @@ const focusCard = document.querySelector("#focusCard");
 const confirmText = document.querySelector("#confirmText");
 const confirmRevealButton = document.querySelector("#confirmRevealButton");
 const cancelRevealButton = document.querySelector("#cancelRevealButton");
+const confirmStage = document.querySelector(".confirm-stage");
 
 function shuffle(items) {
   return [...items].sort(() => Math.random() - 0.5);
@@ -1261,6 +1262,94 @@ function guess(id) {
   openConfirmOverlay(selectedProfile, correct, message, id);
 }
 
+function setOverlayStyle(element, property, value, priority = "") {
+  if (!element || !element.style) {
+    return;
+  }
+
+  if (typeof element.style.setProperty === "function") {
+    element.style.setProperty(property, value, priority);
+    return;
+  }
+
+  element.style[property] = value;
+}
+
+function clearOverlayStyle(element, properties) {
+  if (!element || !element.style) {
+    return;
+  }
+
+  properties.forEach((property) => {
+    if (typeof element.style.removeProperty === "function") {
+      element.style.removeProperty(property);
+      return;
+    }
+
+    element.style[property] = "";
+  });
+}
+
+function forceShowConfirmOverlay() {
+  if (document.body && typeof document.body.appendChild === "function") {
+    document.body.appendChild(confirmOverlay);
+  }
+
+  [
+    ["display", "grid", "important"],
+    ["visibility", "visible", "important"],
+    ["opacity", "1", "important"],
+    ["position", "fixed", "important"],
+    ["inset", "0", "important"],
+    ["z-index", "2147483647", "important"],
+    ["place-items", "center", "important"],
+    ["align-items", "center", "important"],
+    ["padding", "12px", "important"],
+    ["background", "rgba(23, 32, 42, 0.78)", "important"],
+    ["pointer-events", "auto", "important"]
+  ].forEach(([property, value, priority]) => {
+    setOverlayStyle(confirmOverlay, property, value, priority);
+  });
+
+  if (confirmStage) {
+    [
+      ["display", "grid", "important"],
+      ["visibility", "visible", "important"],
+      ["opacity", "1", "important"],
+      ["width", "min(560px, calc(100vw - 24px))", "important"],
+      ["max-height", "calc(100dvh - 24px)", "important"],
+      ["overflow-y", "auto", "important"]
+    ].forEach(([property, value, priority]) => {
+      setOverlayStyle(confirmStage, property, value, priority);
+    });
+  }
+}
+
+function forceHideConfirmOverlay() {
+  clearOverlayStyle(confirmOverlay, [
+    "display",
+    "visibility",
+    "opacity",
+    "position",
+    "inset",
+    "z-index",
+    "place-items",
+    "align-items",
+    "padding",
+    "background",
+    "pointer-events"
+  ]);
+
+  clearOverlayStyle(confirmStage, [
+    "display",
+    "visibility",
+    "opacity",
+    "width",
+    "max-height",
+    "overflow-y"
+  ]);
+}
+
 function openConfirmOverlay(profile, correct, message, id) {
   state.locked = true;
   state.pendingGuess = { correct, message, id };
@@ -1272,9 +1361,7 @@ function openConfirmOverlay(profile, correct, message, id) {
   confirmText.textContent = `你选的是「${profile.name}」。再点一次大图或“揭示答案”，这局就开牌。`;
   confirmOverlay.classList.remove("hidden");
   confirmOverlay.classList.add("is-open");
-  confirmOverlay.style.display = "grid";
-  confirmOverlay.style.visibility = "visible";
-  confirmOverlay.style.opacity = "1";
+  forceShowConfirmOverlay();
   if (typeof confirmOverlay.setAttribute === "function") {
     confirmOverlay.setAttribute("aria-hidden", "false");
   }
@@ -1291,9 +1378,7 @@ function closeConfirmOverlay() {
 
   confirmOverlay.classList.add("hidden");
   confirmOverlay.classList.remove("is-open");
-  confirmOverlay.style.display = "";
-  confirmOverlay.style.visibility = "";
-  confirmOverlay.style.opacity = "";
+  forceHideConfirmOverlay();
   if (typeof confirmOverlay.setAttribute === "function") {
     confirmOverlay.setAttribute("aria-hidden", "true");
   }
