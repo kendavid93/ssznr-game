@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>谁是真直男</title>
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <main class="game-shell">
+      <section class="topbar" aria-label="游戏状态">
+        <div>
+          <p class="kicker">9宫格伪照片识图局</p>
+          <h1>谁是真直男</h1>
+        </div>
+        <div class="scoreboard">
+          <div>
+            <span>轮次</span>
+            <strong id="roundText">1/5</strong>
+          </div>
+          <div>
+            <span>得分</span>
+            <strong id="scoreText">0</strong>
+          </div>
+          <div>
+            <span>时间</span>
+            <strong id="timerText">45</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="brief" aria-label="当前任务">
+        <div>
+          <h2>请答应我，千万别被各种刻板影响带跑偏了，好吗？</h2>
+          <p>别被穿搭、姿势和滤镜带跑。所有角色都是虚构的，这一局考的是你会不会被刻板印象骗。</p>
+        </div>
+        <button id="restartButton" type="button">重开</button>
+      </section>
+
+      <section id="grid" class="profile-grid" aria-label="伪照片人物卡"></section>
+
+      <section class="result-panel" aria-live="polite">
+        <p id="resultText">先看图，再下注。点一张你觉得最像“混进来的直男卧底”。</p>
+        <button id="nextButton" class="hidden" type="button">下一轮</button>
+      </section>
+    </main>
+
+    <section id="confirmOverlay" class="confirm-overlay hidden" aria-modal="true" role="dialog" aria-labelledby="confirmTitle">
+      <div class="confirm-stage">
+        <div class="confirm-copy">
+          <p class="kicker">最后确认</p>
+          <h2 id="confirmTitle">确定揭示这张？</h2>
+          <p id="confirmText">再次点击大图或确认按钮，才会公布答案。</p>
+        </div>
+        <div id="focusCard" class="focus-card" aria-label="已选中的人物卡"></div>
+        <div class="confirm-actions">
+          <button id="cancelRevealButton" type="button">再看看</button>
+          <button id="confirmRevealButton" type="button">揭示答案</button>
+        </div>
+      </div>
+    </section>
+
+    <script src="./game.js"></script>
+  </body>
+</html>
