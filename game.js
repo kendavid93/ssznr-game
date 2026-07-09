@@ -1029,6 +1029,7 @@ const state = {
   targetQueue: [],
   misleadingQueue: [],
   fallbackMisleadingQueue: [],
+  loadingRoundId: 0,
   timerId: 0
 };
 
@@ -1079,6 +1080,49 @@ function drawProfiles(queueKey, pool, count) {
   return picked;
 }
 
+function preloadImage(src) {
+  return new Promise((resolve) => {
+    if (!src || typeof Image === "undefined") {
+      resolve();
+      return;
+    }
+
+    const image = new Image();
+    let settled = false;
+    const finish = () => {
+      if (settled) {
+        return;
+      }
+
+      settled = true;
+      if (typeof image.decode === "function") {
+        image.decode().catch(() => {}).then(resolve);
+        return;
+      }
+
+      resolve();
+    };
+
+    image.onload = finish;
+    image.onerror = finish;
+    image.decoding = "async";
+    image.src = src;
+
+    if (image.complete) {
+      finish();
+    }
+  });
+}
+
+function preloadRoundImages(profiles) {
+  if (typeof Image === "undefined") {
+    return null;
+  }
+
+  const sources = [...new Set(profiles.map((profile) => profile.imageSrc).filter(Boolean))];
+  return Promise.all(sources.map(preloadImage));
+}
+
 function pickRoundProfiles() {
   const target = drawProfile("targetQueue", straightDecoys);
   const picturedPool = misleadingProfiles.filter((profile) => profile.imageSrc);
@@ -1095,6 +1139,20 @@ function pickRoundProfiles() {
   }));
 }
 
+function startRoundTimer(loadId) {
+  if (loadId !== state.loadingRoundId || state.selectedId) {
+    return;
+  }
+
+  state.locked = false;
+  [...document.querySelectorAll(".profile-card")].forEach((card) => {
+    card.disabled = false;
+  });
+  resultText.textContent = "图片就绪。先看图，再下注。点一张你觉得最像“混进来的直男卧底”。";
+  renderStatus();
+  state.timerId = setInterval(tick, 1000);
+}
+
 function renderStatus() {
   roundText.textContent = `${state.round}/${roundsTotal}`;
   scoreText.textContent = String(state.score);
@@ -1103,10 +1161,13 @@ function renderStatus() {
 
 function renderRound() {
   clearInterval(state.timerId);
+  state.timerId = 0;
   state.time = secondsPerRound;
-  state.locked = false;
+  state.locked = true;
   state.selectedId = "";
   state.pendingGuess = null;
+  const loadId = state.loadingRoundId + 1;
+  state.loadingRoundId = loadId;
   closeConfirmOverlay();
 
   const profiles = pickRoundProfiles();
@@ -1114,7 +1175,7 @@ function renderRound() {
   state.currentProfiles = profiles;
   state.targetId = target.id;
 
-  resultText.textContent = "先看图，再下注。点一张你觉得最像“混进来的直男卧底”。";
+  resultText.textContent = "正在加载本轮照片，倒计时会在 9 张图就绪后开始。";
   nextButton.classList.add("hidden");
   grid.innerHTML = "";
 
@@ -1122,6 +1183,7 @@ function renderRound() {
     const card = document.createElement("button");
     card.type = "button";
     card.className = "profile-card";
+    card.disabled = true;
     card.dataset.id = profile.id;
     card.dataset.target = profile.isTarget ? "true" : "false";
     card.style.setProperty("--skin", profile.photoStyle.skin);
@@ -1164,7 +1226,13 @@ function renderRound() {
   });
 
   renderStatus();
-  state.timerId = setInterval(tick, 1000);
+  const imagePreload = preloadRoundImages(profiles);
+  if (!imagePreload) {
+    startRoundTimer(loadId);
+    return;
+  }
+
+  imagePreload.then(() => startRoundTimer(loadId));
 }
 
 function tick() {

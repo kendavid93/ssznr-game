@@ -167,6 +167,10 @@ h2 {
   cursor: default;
 }
 
+.profile-card:disabled:not(.revealed) {
+  cursor: wait;
+}
+
 .profile-card.correct {
   background: #e8fff6;
 }
