@@ -1269,6 +1269,13 @@ function openConfirmOverlay(profile, correct, message, id) {
   focusCard.innerHTML = selectedCard ? selectedCard.innerHTML : "";
   confirmText.textContent = `你选的是「${profile.name}」。再点一次大图或“揭示答案”，这局就开牌。`;
   confirmOverlay.classList.remove("hidden");
+  confirmOverlay.classList.add("is-open");
+  if (typeof confirmOverlay.setAttribute === "function") {
+    confirmOverlay.setAttribute("aria-hidden", "false");
+  }
+  if (document.body && document.body.classList) {
+    document.body.classList.add("modal-open");
+  }
   resultText.textContent = `已锁定「${profile.name}」。先别急着笑，确认后才揭示。`;
 }
 
@@ -1278,6 +1285,13 @@ function closeConfirmOverlay() {
   }
 
   confirmOverlay.classList.add("hidden");
+  confirmOverlay.classList.remove("is-open");
+  if (typeof confirmOverlay.setAttribute === "function") {
+    confirmOverlay.setAttribute("aria-hidden", "true");
+  }
+  if (document.body && document.body.classList) {
+    document.body.classList.remove("modal-open");
+  }
   if (focusCard) {
     focusCard.className = "focus-card";
     focusCard.innerHTML = "";

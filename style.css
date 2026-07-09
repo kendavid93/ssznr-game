@@ -28,6 +28,10 @@ body {
     var(--paper);
 }
 
+body.modal-open {
+  overflow: hidden;
+}
+
 button {
   min-height: 42px;
   border: 2px solid var(--line);
@@ -626,6 +630,10 @@ h2 {
   background: rgba(23, 32, 42, 0.72);
 }
 
+.confirm-overlay.is-open {
+  display: grid;
+}
+
 .confirm-stage {
   display: grid;
   grid-template-columns: minmax(260px, 360px) minmax(320px, 520px);
@@ -911,17 +919,27 @@ h2 {
   }
 
   .confirm-overlay {
+    inset: 0;
+    z-index: 100;
+    place-items: end center;
     align-items: end;
     padding: 10px;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .confirm-stage {
+    align-self: end;
     grid-template-columns: 1fr;
     gap: 12px;
     width: 100%;
+    max-height: calc(100vh - 20px);
     max-height: calc(100dvh - 20px);
     border-radius: 8px 8px 0 0;
     padding: 13px;
+    overflow-y: auto;
     box-shadow: 0 -7px 0 var(--line);
   }
 
