@@ -1,5 +1,7 @@
 const roundsTotal = 5;
 const secondsPerRound = 45;
+const cardsPerRound = 8;
+const misleadingPerRound = cardsPerRound - 1;
 
 const straightDecoys = [
   {
@@ -1127,11 +1129,11 @@ function pickRoundProfiles() {
   const target = drawProfile("targetQueue", straightDecoys);
   const picturedPool = misleadingProfiles.filter((profile) => profile.imageSrc);
   const fallbackPool = misleadingProfiles.filter((profile) => !profile.imageSrc);
-  const picturedOthers = drawProfiles("misleadingQueue", picturedPool, 8);
+  const picturedOthers = drawProfiles("misleadingQueue", picturedPool, misleadingPerRound);
   const fallbackOthers = fallbackPool.length > 0
-    ? drawProfiles("fallbackMisleadingQueue", fallbackPool, 8 - picturedOthers.length)
+    ? drawProfiles("fallbackMisleadingQueue", fallbackPool, misleadingPerRound - picturedOthers.length)
     : [];
-  const others = [...picturedOthers, ...fallbackOthers].slice(0, 8);
+  const others = [...picturedOthers, ...fallbackOthers].slice(0, misleadingPerRound);
   return shuffle([target, ...others]).map((profile, index) => ({
     ...profile,
     id: `${profile.name}-${state.round}-${index}`,
@@ -1175,7 +1177,7 @@ function renderRound() {
   state.currentProfiles = profiles;
   state.targetId = target.id;
 
-  resultText.textContent = "正在加载本轮照片，倒计时会在 9 张图就绪后开始。";
+  resultText.textContent = `正在加载本轮照片，倒计时会在 ${cardsPerRound} 张图就绪后开始。`;
   nextButton.classList.add("hidden");
   grid.innerHTML = "";
 
@@ -1193,7 +1195,7 @@ function renderRound() {
     card.style.setProperty("--backdrop", profile.photoStyle.backdrop);
     card.innerHTML = `
       <span class="stamp">${profile.isTarget ? "直男卧底" : "不是卧底"}</span>
-      <div class="photo-frame ${profile.photoStyle.pose}" aria-label="伪照片：${profile.visualArchetype}">
+      <div class="photo-frame ${profile.imageSrc ? "has-photo" : ""} ${profile.photoStyle.pose}" aria-label="伪照片：${profile.visualArchetype}">
         ${
           profile.imageSrc
             ? `<img class="portrait-photo" src="${profile.imageSrc}" alt="${profile.visualArchetype}：${profile.name}">`

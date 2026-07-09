@@ -141,7 +141,7 @@ h2 {
 
 .profile-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
   margin-top: 14px;
 }
@@ -203,12 +203,16 @@ h2 {
   object-position: center center;
 }
 
+.photo-frame.has-photo,
 .photo-frame:has(.portrait-photo) {
   background: #111827;
 }
 
+.photo-frame.has-photo::before,
+.photo-frame.has-photo::after,
 .photo-frame:has(.portrait-photo)::before,
 .photo-frame:has(.portrait-photo)::after {
+  content: none;
   display: none;
 }
 
