@@ -1272,6 +1272,9 @@ function openConfirmOverlay(profile, correct, message, id) {
   confirmText.textContent = `你选的是「${profile.name}」。再点一次大图或“揭示答案”，这局就开牌。`;
   confirmOverlay.classList.remove("hidden");
   confirmOverlay.classList.add("is-open");
+  confirmOverlay.style.display = "grid";
+  confirmOverlay.style.visibility = "visible";
+  confirmOverlay.style.opacity = "1";
   if (typeof confirmOverlay.setAttribute === "function") {
     confirmOverlay.setAttribute("aria-hidden", "false");
   }
@@ -1288,6 +1291,9 @@ function closeConfirmOverlay() {
 
   confirmOverlay.classList.add("hidden");
   confirmOverlay.classList.remove("is-open");
+  confirmOverlay.style.display = "";
+  confirmOverlay.style.visibility = "";
+  confirmOverlay.style.opacity = "";
   if (typeof confirmOverlay.setAttribute === "function") {
     confirmOverlay.setAttribute("aria-hidden", "true");
   }

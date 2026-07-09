@@ -218,8 +218,9 @@ h2 {
 
 .photo-frame::before,
 .photo-frame::after {
-  content: "";
+  content: none;
   position: absolute;
+  display: none;
   border: 2px solid rgba(255, 255, 255, 0.55);
   opacity: 0.7;
 }
@@ -635,7 +636,7 @@ h2 {
 }
 
 .confirm-overlay.is-open {
-  display: grid;
+  display: grid !important;
 }
 
 .confirm-stage {
